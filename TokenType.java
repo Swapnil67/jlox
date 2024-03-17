@@ -1,4 +1,4 @@
-package com.craftinginterpreters.lox;
+package lox;
 
 enum TokenType {
   // * Single-Character tokens
@@ -13,10 +13,8 @@ enum TokenType {
   IDENTIFIER, STRING, NUMBER,
 
   // * Keywords
-  AND, CLASS, ELSE, FLASE, FUN, FOR, IF, NIL, OR, PRINT,
+  AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR, PRINT,
   RETURN, SUPER, THIS, TRUE, VAR, WHILE,
 
   EOF
 }
-
-

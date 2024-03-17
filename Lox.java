@@ -1,4 +1,4 @@
-package com.craftinginterpreters.lox;
+package lox;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Lox {
 
- static bookean hadError = false;
+ static boolean hadError = false;
 
   public static void main(String[] args) throws IOException {
     if(args.length > 1) {
@@ -18,9 +18,11 @@ public class Lox {
       System.exit(64);
     }
     else if(args.length == 1) {
+      System.out.println("runFile");
       runFile(args[0]);
     }
     else {
+      System.out.println("runPrompt");
       runPrompt();
     }
   }
@@ -33,7 +35,7 @@ public class Lox {
   }
 
   private static void runPrompt() throws IOException {
-    InputStreamReader input = new ImputStreamReader(System.in);
+    InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
 
     for(;;) {
@@ -46,6 +48,7 @@ public class Lox {
   }
 
   private static void run(String source) {
+    System.out.println(source);
     Scanner scanner = new Scanner(source);
     List<Token> tokens = scanner.scanTokens();
 
@@ -61,7 +64,7 @@ public class Lox {
 
   private static void report(int line, String where, String message) {
     System.err.println("[line " + line + "] Error " + where + ": " + message);
-    hadError = true
+    hadError = true;
   }
 
 }

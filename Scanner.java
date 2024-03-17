@@ -1,11 +1,11 @@
-package com.craftinginterpreters.lox;
+package lox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.craftinginterpreters.lox.TokenType.*;
+import static lox.TokenType.*;
 
 class Scanner {
   private final String source;
@@ -19,7 +19,7 @@ class Scanner {
   }
 
   List<Token> scanTokens() {
-    while(isAtEnd()) {
+    while(!isAtEnd()) {
       // * We are at the beginning of the next lexeme
       start = current;
       scanToken();
@@ -43,51 +43,53 @@ class Scanner {
       case ';': addToken(SEMICOLON); break;
       case '*': addToken(STAR); break;
       case '!':
-          addToken(match('=') ? BANG_EQUAL : BANG)
+          addToken(match('=') ? BANG_EQUAL : BANG);
           break;
       case '=':
-          addToken(match('=') ? EQUAL_EQUAL : EQUAL)
+          addToken(match('=') ? EQUAL_EQUAL : EQUAL);
           break;
       case '<':
-          addToken(match('<') ? LESS_EQUAL : LESS)
+          addToken(match('<') ? LESS_EQUAL : LESS);
           break;
       case '>':
-          addToken(match('>') ? GREATER_EQUAL : GREATER)
+          addToken(match('>') ? GREATER_EQUAL : GREATER);
           break;
       case '/':
           if(match('/')) {
-            // * Acoment goes until the end of the line
-            while(peek() != '\n' && !isAtEnd()) advance()
+            // * A comment goes until the end of the line
+            while(peek() != '\n' && !isAtEnd()) advance();
+          } else if(match('*')) {
+            multilineComment();
           } else {
             addToken(SLASH);
           }
-      case '"'
+        break;
+      case '"':
         string();
         break;
-      case ' '
-      case '\r'
-      case '\n'
+      case ' ':
+      case '\r':
         // * ignore whitespace
         break;
-      
-      case '\n'
+
+      case '\n':
         line++;
         break;
 
       default: 
         if(isDigit(c)) {
-          number()
+          number();
         } 
-        else if(isAlpha()) {
-          identifier()
+        else if(isAlpha(c)) {
+          identifier();
         } else {
-          Lox.error(line, 'Unexpected character.');
+          Lox.error(line, "Unexpected character.");
         }
         break;
     }
   }
 
-  private static final Map<String, TokenType? keywords;
+  private static final Map<String, TokenType> keywords;
   static {
     keywords = new HashMap<>();
     keywords.put("and",     AND);
@@ -140,21 +142,45 @@ class Scanner {
       return;
     }
 
-    advance(); // * The closing ".
+    advance(); // * till the closing ".
     // * Trim the surrounding quotes
     String value = source.substring(start+1, current-1);
     addToken(STRING, value);
   }
 
+  private void multilineComment() {
+   
+    // * Move forwart till you find */
+    while(peek() != '*' && peekNext() != '/') {
+      if(peek() == '\n') line++;
+      advance();
+    }
+    advance();
+   
+    if(!isAtEnd() && peek() == '/') {
+      advance();
+      return;
+    }
+
+    if(isAtEnd()) {
+      return;
+    }
+
+    if(peekNext() != '/') {
+      Lox.error(line, "Unterminated comment.");
+      return;
+    }
+  }
+
   private boolean match(char expected) {
     if(isAtEnd()) return false;
-    if(source.chatAt(current) != expected) return false;
+    if(source.charAt(current) != expected) return false;
     current++;
     return true;
   }
 
   private char peek() {
-    if(isAtEnd) return '\0';
+    if(isAtEnd()) return '\0';
     return source.charAt(current);
   }
 
@@ -178,7 +204,7 @@ class Scanner {
   }
 
   private boolean isAtEnd() {
-    return current >= source.length;
+    return current >= source.length();
   }
 
   /*
@@ -195,7 +221,7 @@ class Scanner {
   // * Grabs the text of current lexeme and creates a new token for it
   private void addToken(TokenType type, Object literal) {
     String text = source.substring(start, current);
-    tokens.add(new Token(type, text, literal, line))
+    tokens.add(new Token(type, text, literal, line));
   }
   
 

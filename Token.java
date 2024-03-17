@@ -1,10 +1,11 @@
-package com.craftinginterpreters.lox;
+//> Scanning token-class
+package lox;
 
 class Token {
   final TokenType type;
   final String lexeme;
   final Object literal;
-  final int line;
+  final int line; // [location]
 
   Token(TokenType type, String lexeme, Object literal, int line) {
     this.type = type;
@@ -12,7 +13,7 @@ class Token {
     this.literal = literal;
     this.line = line;
   }
-
+  
   public String toString() {
     return type + " " + lexeme + " " + literal;
   }
