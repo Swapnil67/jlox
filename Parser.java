@@ -1,6 +1,7 @@
 package lox;
 
 import java.util.List;
+import java.util.ArrayList;
 import static lox.TokenType.*;
 
 class Parser {
@@ -15,18 +16,44 @@ class Parser {
     this.tokens = tokens;
   }
 
-  Expr parse() {
-    try {
-      return expression();
-    } catch (ParseError e) {
-      return null;
+  List<Stmt> parse() {
+    List<Stmt> statements = new ArrayList<>();
+    while(!isAtEnd()) {
+      statements.add(statement());
     }
+    return statements;
   }
 
   private Expr expression() {
     return equality();
   }
 
+  /**
+   * * Parse the statement
+   * * [PRINT]
+   * @return
+   */
+  private Stmt statement() {
+    if(match(PRINT)) return printStatement();
+    return expressionStatement();
+  }
+
+  private Stmt printStatement() {
+    Expr value = expression();
+    consume(SEMICOLON, "Expect ';' after value.");
+    return new Stmt.Print(value);
+  }
+
+  private Stmt expressionStatement() {
+    Expr expr = expression();
+    consume(SEMICOLON, "Expect ';' after expression.");
+    return new Stmt.Expression(expr);
+  }
+
+  /**
+   * * [BANG_EQUAL, EQUAL_EQUAL]
+   * @return expression
+  */
   private Expr equality() {
     Expr expr = comparision();
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
@@ -37,6 +64,10 @@ class Parser {
     return expr;
   }
 
+  /**
+   * * [GREATER, GREATER_EQUAL, LESS, LESS_EQUAL]
+   * @return expression
+   */
   private Expr comparision() {
     Expr expr = term();
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
@@ -48,6 +79,10 @@ class Parser {
     return expr;
   }
 
+  /**
+   * * [MINUS, PLUS]
+   * @return expression
+   */
   private Expr term() {
     Expr expr = factor();
     while (match(MINUS, PLUS)) {
@@ -58,6 +93,10 @@ class Parser {
     return expr;
   }
 
+  /**
+   * * [STAR, SLASH]
+   * @return expression
+   */
   private Expr factor() {
     Expr expr = unary();
     while (match(SLASH, STAR)) {
@@ -68,6 +107,10 @@ class Parser {
     return expr;
   }
 
+    /**
+   * * [BANG, MINUS]
+   * @return expression
+   */
   private Expr unary() {
     if (match(BANG, MINUS)) {
       Token operator = previous();
@@ -110,8 +153,7 @@ class Parser {
 
   /**
    * * Similar to match in that it checks if the next token is of the expected
-   * type.
-   * 
+   * * type.
    * @param type
    * @param message
    * @return

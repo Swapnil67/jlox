@@ -1,16 +1,19 @@
 package lox;
 
-class Interpreter implements Expr.Visitor<Object> {
+import java.util.List;
+
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   /**
    * * Takes the syntax tree for an expression and evaluates it.
    * 
    * @param expression
    */
-  void interpret(Expr expression) {
+  void interpret(List<Stmt> statements) {
     try {
-      Object value = evaluate(expression);
-      System.out.println(Stringify(value));
+      for(Stmt statement: statements) {
+        execute(statement);
+      }
     } catch (RuntimeError error) {
       Lox.RuntimeError(error);
     }
@@ -98,9 +101,9 @@ class Interpreter implements Expr.Visitor<Object> {
    * * To convert a Lox value to a string.
    * 
    * @param object
-   * @return
+   * @return String
    */
-  private String Stringify(Object object) {
+  private String stringify(Object object) {
     if (object == null)
       return "nil";
     if (object instanceof Double) {
@@ -121,6 +124,23 @@ class Interpreter implements Expr.Visitor<Object> {
 
   private Object evaluate(Expr expr) {
     return expr.accept(this);
+  }
+
+  private void execute(Stmt stmt) {
+    stmt.accept(this);
+  }
+
+  @Override
+  public Void visitExpressionStmt(Stmt.Expression stmt) {
+    evaluate(stmt.expression);
+    return null;
+  }
+
+  @Override
+  public Void visitPrintStmt(Stmt.Print stmt) {
+    Object value = evaluate(stmt.expression);
+    System.out.println(stringify(value));
+    return null;
   }
 
   @Override
@@ -157,9 +177,9 @@ class Interpreter implements Expr.Visitor<Object> {
           return (String) left + (String) right;
         }
         if (left instanceof String && right instanceof Double) {
-          return (String) left + Stringify(right);
+          return (String) left + stringify(right);
         } else if (left instanceof Double && right instanceof String) {
-          return Stringify(left) + (String) right;
+          return stringify(left) + (String) right;
         }
         throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
       case SLASH:

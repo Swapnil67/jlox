@@ -20,10 +20,8 @@ public class Lox {
       System.out.println("Usage: jlox [script]");
       System.exit(64);
     } else if (args.length == 1) {
-      System.out.println("runFile");
       runFile(args[0]);
     } else {
-      System.out.println("runPrompt");
       runPrompt();
     }
   }
@@ -59,20 +57,22 @@ public class Lox {
 
     // * For now, just print the tokens
     // for(Token token: tokens) {
-    // System.out.println(token);
+    //   System.out.println(token);
     // }
 
     // * Parse the tokens
+    // Expr expression = parser.parse();
     Parser parser = new Parser(tokens);
-    Expr expression = parser.parse();
+    List<Stmt> statements = parser.parse();
 
     // * Stop if there was a syntax error
-    // if (hadError)
-    //   return;
+    if (hadError)
+      return;
 
     // System.out.println(new AstPrinter().print(expression));
+    // interpreter.interpret(expression);
 
-    interpreter.interpret(expression);
+    interpreter.interpret(statements);
   }
 
   static void error(int line, String message) {
