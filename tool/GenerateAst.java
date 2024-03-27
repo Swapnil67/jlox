@@ -15,11 +15,13 @@ public class GenerateAst {
       "Binary: Expr left, Token operator, Expr right",
       "Grouping: Expr expression",
       "Literal: Object value",
+      "Variable: Token name",
       "Unary: Token operator, Expr right"
     ));
     
     defineAst(outputDir, "Stmt", Arrays.asList(
       "Expression: Expr expression",
+      // "Var: Token name, Expr initializer",
       "Print: Expr expression"
     ));
   }
