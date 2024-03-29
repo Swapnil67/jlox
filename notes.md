@@ -7,8 +7,8 @@
   - Haskell(++)
 - In java, javascript, python the '+' operator is overloaded to support both adding numbers and concatenating strings.
 - Function return values, but procedures cannot.
-- There is no place in grammer where both an expression and statement are allowed. The operands of say, '+' are always expressions, never statements. The body of while look is always statement.
-
+- There is no place in grammer where both an expression and statement are allowed. The operands of say, '+' are always expressions,   never statements. The body of while look is always statement.
+- Scheme allows redifining variables at the top level. 
 # Program
 - A program is a list of statements followed by a special "end of file" [EOF] token.
 
