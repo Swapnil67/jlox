@@ -52,6 +52,7 @@ public class Lox {
 
   private static void run(String source) {
     System.out.println(source);
+    // * Step 1: Scanning / Lexical Analysis
     Scanner scanner = new Scanner(source);
     List<Token> tokens = scanner.scanTokens();
 

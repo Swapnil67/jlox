@@ -1,5 +1,7 @@
 # jlox
-- It is a dynamically typed language
+- Lox is a Dynamically Typed Programming Language created by Bob Nystrom for his excellent book Crafting Interpreters.
+
+
 
 # Step 1
 # Scanning or Lexical Analysis
@@ -9,6 +11,14 @@
 
 # Step 3
 # Interpreter & Execution
+
+
+# Special Notes
+- Variable Declaration
+```lox
+var a;
+print a; // nil
+```
 
 
 # Books
