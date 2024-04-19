@@ -11,19 +11,23 @@ public class GenerateAst {
       System.err.println("Usage: generate_ast <output directory>");
     }
     String outputDir = args[0];
+
+    // * Expression = Assign | Binary | Grouping | Literal | Variable | Unary
     defineAst(outputDir, "Expr", Arrays.asList(
       "Assign   : Token name, Expr value", 
       "Binary        : Expr left, Token operator, Expr right",
       "Grouping      : Expr expression",
       "Literal       : Object value",
-      "Variable      : Token name",
-      "Unary         : Token operator, Expr right"
+      "Unary         : Token operator, Expr right",
+      "Variable      : Token name"
     ));
+
     
+    // * Statement = Expression | Print
     defineAst(outputDir, "Stmt", Arrays.asList(
-      "Expression: Expr expression",
-      // "Var: Token name, Expr initializer",
-      "Print: Expr expression"
+      "Expression : Expr expression",
+      "Print      : Expr expression",
+      "Var        : Token name, Expr initializer"
     ));
   }
 
@@ -101,4 +105,8 @@ public class GenerateAst {
 /*
  * run this file with following argument
  * $PWD/lox
+ * 
+ * Example
+ * Run Following command to generate AST
+ * /usr/bin/env /opt/homebrew/Cellar/openjdk@11/11.0.20/libexec/openjdk.jdk/Contents/Home/bin/java -cp /Users/swapnil67/Library/Application\ Support/Code/User/workspaceStorage/8adf57cf34eae191d5e643c8a34d882f/redhat.java/jdt_ws/jdt.ls-java-project/bin lox.tool.GenerateAst  /Users/swapnil67/Developer/complier/lox
 */

@@ -16,12 +16,17 @@ class Parser {
     this.tokens = tokens;
   }
 
+  /**
+   * * This parses the series of statements as many as it can find until it hits the end of the input.
+   * @return
+   */
   List<Stmt> parse() {
     List<Stmt> statements = new ArrayList<>();
-    while(!isAtEnd()) {
+    while (!isAtEnd()) {
       statements.add(declaration());
     }
-    return statements;
+
+    return statements; 
   }
 
   private Expr expression() {
@@ -29,22 +34,29 @@ class Parser {
     return assignment();
   }
 
+  /**
+   * * This can be a declaration or a statement
+   * @return
+   */
   private Stmt declaration() {
     try {
       if(match(VAR)) return varDeclaration();
       return statement();
     } catch (ParseError e) {
       synchronize();
+      return null;
     }
   }
 
   /**
+   * * Program is a list of statements we parse one of those statements using this method
    * * Parse the statement
    * * [PRINT]
    * @return
    */
   private Stmt statement() {
-    if(match(PRINT)) return printStatement();
+    if (match(PRINT)) return printStatement();
+
     return expressionStatement();
   }
 

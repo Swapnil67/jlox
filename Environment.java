@@ -37,6 +37,7 @@ class Environment {
       return;
     }
 
+    //* If varible doesn't exitst while assigning its a runtime error */
     throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
   }
 

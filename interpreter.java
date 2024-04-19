@@ -7,7 +7,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   private Environment environment = new Environment();
 
   /**
-   * * Takes the syntax tree for an expression and evaluates it.
+   * * Takes the Statement syntax tree for an expression and evaluates it.
    * 
    * @param expression
    */
@@ -17,10 +17,10 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         execute(statement);
       }
     } catch (RuntimeError error) {
-      Lox.RuntimeError(error);
+      Lox.runtimeError(error);
     }
   }
-
+  
   @Override
   public Object visitLiteralExpr(Expr.Literal expr) {
     return expr.value;
@@ -137,9 +137,11 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     stmt.accept(this);
   }
 
+
   @Override
   public Void visitExpressionStmt(Stmt.Expression stmt) {
     evaluate(stmt.expression);
+    // * Java requires that to satisfy the specical capitalized Void return type
     return null;
   }
 
@@ -165,6 +167,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   public Object visitAssignExpr(Expr.Assign expr) {
     Object value = evaluate(expr.value);
     environment.assign(expr.name, value);
+    return value;
   }
 
   @Override

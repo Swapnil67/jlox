@@ -36,6 +36,7 @@ public class Lox {
       System.exit(70);
   }
 
+  // * REPL
   private static void runPrompt() throws IOException {
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader reader = new BufferedReader(input);
@@ -62,17 +63,16 @@ public class Lox {
     // }
 
     // * Parse the tokens
-    // Expr expression = parser.parse();
     Parser parser = new Parser(tokens);
+    // Expr expression = parser.parse();
+    // System.out.println(new AstPrinter().print(expression));
     List<Stmt> statements = parser.parse();
 
     // * Stop if there was a syntax error
     if (hadError)
       return;
 
-    // System.out.println(new AstPrinter().print(expression));
-    // interpreter.interpret(expression);
-
+    // // interpreter.interpret(expression);
     interpreter.interpret(statements);
   }
 

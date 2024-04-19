@@ -18,15 +18,23 @@
 - Scope and environments are close cousins, The former is the theoretical concept, and the latter is the machinery 
   that implements.
 
+## Token 
+- A token represents a unit of code at a specific place in the source text.
 
-# Program
+## Program
 - A program is a list of statements followed by a special "end of file" [EOF] token.
 
-# Side Effects
+## Side Effects
 - State and statements go hand in hand. Since statements, by definition, don't evaluate to a value, they need to  do something else to be useful. That something is called a "side effect"
 
-# Scope
+## Expression Statements
+- Lets you place an expression where a statement is expected.
+- Anytime you see a function or method call followed by ;, you're looking at a expression statement
+
+
+
+## Scope
 - A scope defines a region where a name maps to a certain entity.
 
-# Lexical Scope / Static Scope
+## Lexical Scope / Static Scope
 - It is a specific style of scoping where the text of the program itself shows where a scope begins and ends.
