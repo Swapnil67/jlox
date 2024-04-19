@@ -31,10 +31,7 @@
 - Lets you place an expression where a statement is expected.
 - Anytime you see a function or method call followed by ;, you're looking at a expression statement
 
-
-
 ## Scope
 - A scope defines a region where a name maps to a certain entity.
-
-## Lexical Scope / Static Scope
+### Lexical Scope / Static Scope
 - It is a specific style of scoping where the text of the program itself shows where a scope begins and ends.

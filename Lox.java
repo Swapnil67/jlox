@@ -72,7 +72,8 @@ public class Lox {
     if (hadError)
       return;
 
-    // // interpreter.interpret(expression);
+    // interpreter.interpret(expression);
+    System.out.println("---- Output ----");
     interpreter.interpret(statements);
   }
 

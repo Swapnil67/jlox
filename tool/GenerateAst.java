@@ -7,28 +7,25 @@ import java.util.List;
 
 public class GenerateAst {
   public static void main(String[] args) throws IOException {
-    if(args.length != 1) {
+    if (args.length != 1) {
       System.err.println("Usage: generate_ast <output directory>");
     }
     String outputDir = args[0];
 
     // * Expression = Assign | Binary | Grouping | Literal | Variable | Unary
     defineAst(outputDir, "Expr", Arrays.asList(
-      "Assign   : Token name, Expr value", 
-      "Binary        : Expr left, Token operator, Expr right",
-      "Grouping      : Expr expression",
-      "Literal       : Object value",
-      "Unary         : Token operator, Expr right",
-      "Variable      : Token name"
-    ));
+        "Assign   : Token name, Expr value",
+        "Binary        : Expr left, Token operator, Expr right",
+        "Grouping      : Expr expression",
+        "Literal       : Object value",
+        "Unary         : Token operator, Expr right",
+        "Variable      : Token name"));
 
-    
     // * Statement = Expression | Print
     defineAst(outputDir, "Stmt", Arrays.asList(
-      "Expression : Expr expression",
-      "Print      : Expr expression",
-      "Var        : Token name, Expr initializer"
-    ));
+        "Expression : Expr expression",
+        "Print      : Expr expression",
+        "Var        : Token name, Expr initializer"));
   }
 
   private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
@@ -44,7 +41,7 @@ public class GenerateAst {
     defineVisitor(writer, baseName, types);
 
     // * AST classes
-    for(String type : types) {
+    for (String type : types) {
       String className = type.split(":")[0].trim();
       String fields = type.split(":")[1].trim();
       defineType(writer, baseName, className, fields);
@@ -62,7 +59,7 @@ public class GenerateAst {
 
   private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
     writer.println("  interface  Visitor<R> {");
-    for(String type: types) {
+    for (String type : types) {
       String typeName = type.split(":")[0].trim();
       writer.println("    R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
     }
@@ -78,7 +75,7 @@ public class GenerateAst {
 
     // * Store parameters in fields
     String[] fields = fieldList.split(", ");
-    for(String field : fields) {
+    for (String field : fields) {
       String name = field.split(" ")[1];
       writer.println("      this." + name + " = " + name + ";");
     }
@@ -93,7 +90,7 @@ public class GenerateAst {
 
     // * Fields
     writer.println();
-    for(String field: fields) {
+    for (String field : fields) {
       writer.println("    final " + field + ";");
     }
 
@@ -108,5 +105,10 @@ public class GenerateAst {
  * 
  * Example
  * Run Following command to generate AST
- * /usr/bin/env /opt/homebrew/Cellar/openjdk@11/11.0.20/libexec/openjdk.jdk/Contents/Home/bin/java -cp /Users/swapnil67/Library/Application\ Support/Code/User/workspaceStorage/8adf57cf34eae191d5e643c8a34d882f/redhat.java/jdt_ws/jdt.ls-java-project/bin lox.tool.GenerateAst  /Users/swapnil67/Developer/complier/lox
-*/
+ * /usr/bin/env
+ * /opt/homebrew/Cellar/openjdk@11/11.0.20/libexec/openjdk.jdk/Contents/Home/bin
+ * /java -cp /Users/swapnil67/Library/Application\
+ * Support/Code/User/workspaceStorage/8adf57cf34eae191d5e643c8a34d882f/redhat.
+ * java/jdt_ws/jdt.ls-java-project/bin lox.tool.GenerateAst
+ * /Users/swapnil67/Developer/complier/lox
+ */

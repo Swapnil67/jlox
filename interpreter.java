@@ -17,7 +17,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         execute(statement);
       }
     } catch (RuntimeError error) {
-      Lox.runtimeError(error);
+      Lox.RuntimeError(error);
     }
   }
   
@@ -177,7 +177,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     switch (expr.operator.type) {
       case GREATER:
-        // TODO compare two strings
+        // compare two strings
         checkNumberOperands(expr.operator, left, right);
         return (double) left > (double) right;
       case GREATER_EQUAL:
