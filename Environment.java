@@ -10,12 +10,28 @@ import java.util.Map;
  */
 
 class Environment {
+
+  final Environment enclosing;
+
   // * Used to store the bindings
   private final Map<String, Object> values = new HashMap<>();
+
+  Environment() {
+    enclosing = null;
+  }
+
+  Environment(Environment enclosising) {
+    this.enclosing = enclosising;
+  }
 
   Object get(Token name) {
     if (values.containsKey(name.lexeme)) {
       return values.get(name.lexeme);
+    }
+
+    // * If varialbe isn't found in this envrionment, we simply try the enclosing one.
+    if(enclosing != null) {
+      return enclosing.get(name);
     }
 
     throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
@@ -34,6 +50,12 @@ class Environment {
   void assign(Token name, Object value) {
     if (values.containsKey(name.lexeme)) {
       values.put(name.lexeme, value);
+      return;
+    }
+
+    // * If varialbe isn't found in this envrionment, we simply try the enclosing one.
+    if(enclosing != null) {
+      enclosing.assign(name, value);;
       return;
     }
 

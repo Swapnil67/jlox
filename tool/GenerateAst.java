@@ -23,6 +23,7 @@ public class GenerateAst {
 
     // * Statement = Expression | Print
     defineAst(outputDir, "Stmt", Arrays.asList(
+      "Block   : List<Stmt> statements", 
         "Expression : Expr expression",
         "Print      : Expr expression",
         "Var        : Token name, Expr initializer"));
@@ -105,10 +106,5 @@ public class GenerateAst {
  * 
  * Example
  * Run Following command to generate AST
- * /usr/bin/env
- * /opt/homebrew/Cellar/openjdk@11/11.0.20/libexec/openjdk.jdk/Contents/Home/bin
- * /java -cp /Users/swapnil67/Library/Application\
- * Support/Code/User/workspaceStorage/8adf57cf34eae191d5e643c8a34d882f/redhat.
- * java/jdt_ws/jdt.ls-java-project/bin lox.tool.GenerateAst
- * /Users/swapnil67/Developer/complier/lox
+ * /usr/bin/env /opt/homebrew/Cellar/openjdk@11/11.0.20/libexec/openjdk.jdk/Contents/Home/bin/java -cp /Users/swapnil67/Library/Application\ Support/Code/User/workspaceStorage/56eed772553f1fb6d0679af17f7144e1/redhat.java/jdt_ws/complier_c86cd7a4/bin lox.tool.GenerateAst  /Users/swapnil67/Developer/complier/lox
  */
