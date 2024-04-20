@@ -55,18 +55,45 @@ class Parser {
    * @return
    */
   private Stmt statement() {
+    if (match(IF)) return ifStatement();
     if (match(PRINT)) return printStatement();
     if(match(LEFT_BRACE)) return new Stmt.Block(block());
 
     return expressionStatement();
   }
 
+  /**
+   * * Parses If Statements
+   * @return Instance of Stmt.If class
+   */
+  private Stmt ifStatement() {
+    consume(LEFT_PAREN, "Expect '(' after 'if'.");
+    Expr condition = expression();
+    consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+    Stmt thenBranch = statement();
+    Stmt elseBranch = null;
+    if(match(ELSE)) {
+      elseBranch = statement();
+    }
+
+    return new Stmt.If(condition, thenBranch, elseBranch);
+  }
+
+  /**
+   * * Parses Print Statements
+   * @return Instance of Stmt.Print class
+   */
   private Stmt printStatement() {
     Expr value = expression();
     consume(SEMICOLON, "Expect ';' after value.");
     return new Stmt.Print(value);
   }
 
+  /**
+   * * Parses Var Statements
+   * @return Instance of Stmt.Var class
+   */
   private Stmt varDeclaration() {
     Token name = consume(IDENTIFIER, "Expect variable name.");
 
@@ -79,13 +106,20 @@ class Parser {
     return new Stmt.Var(name, initializer);
   }
 
+  /**
+   * * Parses Expressions Statments
+   * @return Instance of Stmt.Expression class
+   */
   private Stmt expressionStatement() {
     Expr expr = expression();
     consume(SEMICOLON, "Expect ';' after expression.");
     return new Stmt.Expression(expr);
   }
 
-  // * Parses the block "{" declaration* "}"
+  /**
+   * * Parses the block "{" declaration* "}"
+   * @return List of statements
+   */
   private List<Stmt> block() {
     List<Stmt> statements = new ArrayList<>();
 

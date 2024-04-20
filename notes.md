@@ -35,3 +35,11 @@
 - A scope defines a region where a name maps to a certain entity.
 ### Lexical Scope / Static Scope
 - It is a specific style of scoping where the text of the program itself shows where a scope begins and ends.
+
+## Control Flow
+
+### Conditional or Branching control flow
+- Is used to not execute some piece of code. Imperatively you can think of it as jumping ahead over a region of code.
+
+### Looping control flow
+- Executes a chunk of code more than once. It jumps back so that you can do something again. Since you don’t usually want infinite loops, it typically has some conditional logic to know when to stop looping as well.

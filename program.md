@@ -33,3 +33,26 @@ block          → "{" declaration* "}" ;
 exprStmt       → expression ";" ;
 printStmt      → "print" expression ";" ;
 ```
+
+
+---------------------------------------------------------------------------------
+
+# Control Flow
+
+```
+program        → declaration* EOF ;
+
+declaration    → varDecl
+               | statement ;
+
+statement      → exprStmt
+               | ifStmt ;
+               | printStmt ;
+               | block ;
+
+exprStmt       → expression ";" ;
+ifStmt         → "if" "(" expression ")" statement
+( "else" statement )? ;
+block          → "{" declaration* "}" ;
+printStmt      → "print" expression ";" ;
+```
