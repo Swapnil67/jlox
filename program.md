@@ -10,6 +10,18 @@ statement      → exprStmt
 
 exprStmt       → expression ";" ;
 printStmt      → "print" expression ";" ;
+
+expression     → literal
+               | unary
+               | binary
+               | grouping ;
+
+literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+grouping       → "(" expression ")" ;
+unary          → ( "-" | "!" ) expression ;
+binary         → expression operator expression ;
+operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
+               | "+"  | "-"  | "*" | "/" ;
 ```
 
 ---------------------------------------------------------------------------------
@@ -32,12 +44,25 @@ statement      → exprStmt
 block          → "{" declaration* "}" ;
 exprStmt       → expression ";" ;
 printStmt      → "print" expression ";" ;
+
+expression     → literal
+               | unary
+               | binary
+               | grouping ;
+
+literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+grouping       → "(" expression ")" ;
+unary          → ( "-" | "!" ) expression ;
+binary         → expression operator expression ;
+operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
+               | "+"  | "-"  | "*" | "/" ;
 ```
 
 
 ---------------------------------------------------------------------------------
 
 # Control Flow
+### Conditional Execution
 
 ```
 program        → declaration* EOF ;
@@ -55,4 +80,45 @@ ifStmt         → "if" "(" expression ")" statement
 ( "else" statement )? ;
 block          → "{" declaration* "}" ;
 printStmt      → "print" expression ";" ;
+
+expression     → literal
+               | unary
+               | binary
+               | grouping ;
+
+literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+grouping       → "(" expression ")" ;
+unary          → ( "-" | "!" ) expression ;
+binary         → expression operator expression ;
+operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
+               | "+"  | "-"  | "*" | "/" ;
+```
+---------------------------------------------------------------------------------
+
+# Control Flow
+### Logical Operators
+
+```
+program        → declaration* EOF ;
+
+declaration    → varDecl
+               | statement ;
+
+statement      → exprStmt
+               | ifStmt ;
+               | printStmt ;
+               | block ;
+
+exprStmt       → expression ";" ;
+ifStmt         → "if" "(" expression ")" statement
+( "else" statement )? ;
+block          → "{" declaration* "}" ;
+printStmt      → "print" expression ";" ;
+
+expression     → assignment ;
+assignment     → IDENTIFIER "=" assignment
+               | logic_or ;
+
+logic_or       → logic_and ( "or" logic_and )* ;
+logic_and      → equality ( "and" equality )* ;
 ```
