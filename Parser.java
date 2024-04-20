@@ -57,6 +57,7 @@ class Parser {
   private Stmt statement() {
     if (match(IF)) return ifStatement();
     if (match(PRINT)) return printStatement();
+    if(match(WHILE)) return whileStatement();
     if(match(LEFT_BRACE)) return new Stmt.Block(block());
 
     return expressionStatement();
@@ -104,6 +105,20 @@ class Parser {
 
     consume(SEMICOLON, "Expect ';' after variable declaration.");
     return new Stmt.Var(name, initializer);
+  }
+
+  /**
+   * * Parses While Statements
+   * @return Instance of Stmt.While class
+   */
+  private Stmt whileStatement() {
+    consume(LEFT_PAREN, "Expect '(' after 'while'.");
+    Expr condition = expression();
+    consume(RIGHT_PAREN, "Expect ')' after condition.");
+
+    Stmt body = statement();
+
+    return new Stmt.While(condition, body);
   }
 
   /**

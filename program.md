@@ -38,7 +38,7 @@ declaration    → varDecl
                | statement ;
 
 statement      → exprStmt
-               | printStmt ;
+               | printStmt 
                | block ;
 
 block          → "{" declaration* "}" ;
@@ -71,8 +71,8 @@ declaration    → varDecl
                | statement ;
 
 statement      → exprStmt
-               | ifStmt ;
-               | printStmt ;
+               | ifStmt 
+               | printStmt 
                | block ;
 
 exprStmt       → expression ";" ;
@@ -105,8 +105,8 @@ declaration    → varDecl
                | statement ;
 
 statement      → exprStmt
-               | ifStmt ;
-               | printStmt ;
+               | ifStmt 
+               | printStmt 
                | block ;
 
 exprStmt       → expression ";" ;
@@ -114,6 +114,37 @@ ifStmt         → "if" "(" expression ")" statement
 ( "else" statement )? ;
 block          → "{" declaration* "}" ;
 printStmt      → "print" expression ";" ;
+
+expression     → assignment ;
+assignment     → IDENTIFIER "=" assignment
+               | logic_or ;
+
+logic_or       → logic_and ( "or" logic_and )* ;
+logic_and      → equality ( "and" equality )* ;
+```
+---------------------------------------------------------------------------------
+
+# Control Flow
+### While Loops
+
+```
+program        → declaration* EOF ;
+
+declaration    → varDecl
+               | statement ;
+
+statement      → exprStmt
+               | ifStmt 
+               | printStmt 
+               | whileStmt 
+               | block ;
+
+exprStmt       → expression ";" ;
+ifStmt         → "if" "(" expression ")" statement
+( "else" statement )? ;
+block          → "{" declaration* "}" ;
+printStmt      → "print" expression ";" ;
+whileStmt      → "while" "(" expression ")" statement ;
 
 expression     → assignment ;
 assignment     → IDENTIFIER "=" assignment

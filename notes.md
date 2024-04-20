@@ -17,6 +17,7 @@
 - Most C derived languages assignement is a expression and not a statement
 - Scope and environments are close cousins, The former is the theoretical concept, and the latter is the machinery 
   that implements.
+- Condition is an expression and the body is a statement.
 
 ## Token 
 - A token represents a unit of code at a specific place in the source text.
@@ -43,3 +44,4 @@
 
 ### Looping control flow
 - Executes a chunk of code more than once. It jumps back so that you can do something again. Since you don’t usually want infinite loops, it typically has some conditional logic to know when to stop looping as well.
+- Condition is an expression and the body is a statement.
