@@ -45,3 +45,6 @@
 ### Looping control flow
 - Executes a chunk of code more than once. It jumps back so that you can do something again. Since you don’t usually want infinite loops, it typically has some conditional logic to know when to stop looping as well.
 - Condition is an expression and the body is a statement.
+
+### Desugaring
+- That funny word describes a process where the front end takes code using syntax sugar and translates it to a more primitive form that the back end already knows how to execute.

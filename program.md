@@ -153,3 +153,39 @@ assignment     → IDENTIFIER "=" assignment
 logic_or       → logic_and ( "or" logic_and )* ;
 logic_and      → equality ( "and" equality )* ;
 ```
+
+---------------------------------------------------------------------------------
+
+# Control Flow
+### For Loops
+
+```
+program        → declaration* EOF ;
+
+declaration    → varDecl
+               | statement ;
+
+statement      → exprStmt
+               | forStmt
+               | ifStmt 
+               | printStmt 
+               | whileStmt 
+               | block ;
+
+exprStmt       → expression ";" ;
+forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+                 expression? ";"
+                 expression? ")" statement ;
+ifStmt         → "if" "(" expression ")" statement
+( "else" statement )? ;
+block          → "{" declaration* "}" ;
+printStmt      → "print" expression ";" ;
+whileStmt      → "while" "(" expression ")" statement ;
+
+expression     → assignment ;
+assignment     → IDENTIFIER "=" assignment
+               | logic_or ;
+
+logic_or       → logic_and ( "or" logic_and )* ;
+logic_and      → equality ( "and" equality )* ;
+```
