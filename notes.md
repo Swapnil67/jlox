@@ -18,6 +18,10 @@
 - Scope and environments are close cousins, The former is the theoretical concept, and the latter is the machinery 
   that implements.
 - Condition is an expression and the body is a statement.
+- C language has maximum 127 agruments to a function & java has a limit of 255 arguments
+- The normal way of defining a function that takes multiple arguments is as a series of nested functions. Each function takes 
+  one argument and return a new function. That function consumes the next argument, returns yet another function, and so on. Eventually
+  once all the arguments are consumed, the last function completes the operation. This style is called "Currying" ```[Haskell Curry]```
 
 ## Token 
 - A token represents a unit of code at a specific place in the source text.
@@ -26,7 +30,7 @@
 - A program is a list of statements followed by a special "end of file" [EOF] token.
 
 ## Side Effects
-- State and statements go hand in hand. Since statements, by definition, don't evaluate to a value, they need to  do something else to be useful. That something is called a "side effect"
+- State and statements go hand in hand. Since statements, by definition, don't evaluate to a value, they need to do something else to be useful. That something is called a "side effect"
 
 ## Expression Statements
 - Lets you place an expression where a statement is expected.
@@ -48,3 +52,15 @@
 
 ### Desugaring
 - That funny word describes a process where the front end takes code using syntax sugar and translates it to a more primitive form that the back end already knows how to execute.
+
+# Functions
+
+## Arity
+- Arity is fancy term for the number of arguments a function or operation expects.
+   - unary operators have 1 arity
+   - binary operators have 2 arity
+  With functions arity is determined by number of parameters it declares
+
+## Native functions
+- These are functions that the interpreter exposes to user code but that are implemented in the host language (in our case java), not the 
+  language being implemented (Lox)

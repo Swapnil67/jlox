@@ -290,7 +290,7 @@ class Parser {
     return expr;
   }
 
-    /**
+  /**
    * * [BANG, MINUS]
    * @return expression
    */
@@ -300,7 +300,44 @@ class Parser {
       Expr right = unary();
       return new Expr.Unary(operator, right);
     }
-    return primary();
+    // return primary();
+    return call();
+  }
+
+  /**
+   * Parses single function call
+   * @return expression
+   */
+  private Expr finishCall(Expr callee) {
+    List<Expr> arguments = new ArrayList<>();
+    if(!check(RIGHT_PAREN)) {
+      do {
+        if(arguments.size() >= 255) {
+          error(peek(), "Can't have more than 255 arguments.");
+        }
+        arguments.add(expression());
+      } while(match(COMMA));
+    }
+    Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+    return new Expr.Call(callee, paren, arguments);
+  }
+
+  /**
+   * Parses function call
+   * @return expression
+   */
+  private Expr call() {
+    Expr expr = primary();
+
+    while(true) {
+      if(match(LEFT_PAREN)) {
+        expr = finishCall(expr);
+      }
+      else {
+        break;
+      }
+    }
+    return expr;
   }
 
   private Expr primary() {

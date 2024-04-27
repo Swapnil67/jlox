@@ -169,7 +169,7 @@ statement      → exprStmt
                | forStmt
                | ifStmt 
                | printStmt 
-               | whileStmt 
+               | whileStmt  
                | block ;
 
 exprStmt       → expression ";" ;
