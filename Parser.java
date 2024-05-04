@@ -18,7 +18,9 @@ class Parser {
   }
 
   /**
-   * * This parses the series of statements as many as it can find until it hits the end of the input.
+   * * This parses the series of statements as many as it can find until it hits
+   * the end of the input.
+   * 
    * @return
    */
   List<Stmt> parse() {
@@ -27,7 +29,7 @@ class Parser {
       statements.add(declaration());
     }
 
-    return statements; 
+    return statements;
   }
 
   private Expr expression() {
@@ -37,11 +39,15 @@ class Parser {
 
   /**
    * * This can be a declaration or a statement
+   * 
    * @return
    */
   private Stmt declaration() {
     try {
-      if(match(VAR)) return varDeclaration();
+      if (match(FUN))
+        return function("function");
+      if (match(VAR))
+        return varDeclaration();
       return statement();
     } catch (ParseError e) {
       synchronize();
@@ -50,59 +56,88 @@ class Parser {
   }
 
   /**
-   * * Program is a list of statements we parse one of those statements using this method
+   * * Program is a list of statements we parse one of those statements using this
+   * method
    * * Parse the statement
    * * [PRINT]
+   * 
    * @return
    */
   private Stmt statement() {
-    if (match(FOR)) return forStatement();
-    if (match(IF)) return ifStatement();
-    if (match(PRINT)) return printStatement();
-    if(match(WHILE)) return whileStatement();
-    if(match(LEFT_BRACE)) return new Stmt.Block(block());
+    if (match(FOR))
+      return forStatement();
+    if (match(IF))
+      return ifStatement();
+    if (match(PRINT))
+      return printStatement();
+    if (match(WHILE))
+      return whileStatement();
+    if (match(LEFT_BRACE))
+      return new Stmt.Block(block());
 
     return expressionStatement();
   }
 
+  private Stmt.Function function(String kind) {
+    Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+
+    consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+
+    // * This is like the code for handling arguments in a call
+    List<Token> parameters = new ArrayList<>();
+    if (!check(RIGHT_PAREN)) {
+      do {
+        if (parameters.size() >= 255) {
+          error(peek(), "Can't have more than 255 parameters.");
+        }
+        parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+      } while (match(COMMA));
+    }
+
+    consume(RIGHT_PAREN, "Expect ')' after parameters.");
+    consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+    List<Stmt> body = block();
+    return new Stmt.Function(name, parameters, body);
+  }
 
   private Stmt forStatement() {
     consume(LEFT_PAREN, "Expect '(' after 'for'.");
 
     Stmt initializer;
-    if(match(SEMICOLON)) {
+    if (match(SEMICOLON)) {
       initializer = null;
-    } else if(match(VAR)) {
+    } else if (match(VAR)) {
       initializer = varDeclaration();
     } else {
       initializer = expressionStatement();
     }
 
     Expr condition = null;
-    if(!check(SEMICOLON)) {
+    if (!check(SEMICOLON)) {
       condition = expression();
     }
     consume(SEMICOLON, "Expect ';' after loop condition.");
 
     Expr increment = null;
-    if(!check(RIGHT_PAREN)) {
+    if (!check(RIGHT_PAREN)) {
       increment = expression();
     }
     consume(RIGHT_PAREN, "Expect ')' after for clauses.");
 
     Stmt body = statement();
 
-    if(increment != null) {
+    if (increment != null) {
       body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
     }
 
     // * If no condition then make it an infinite loop
-    if(condition == null) condition = new Expr.Literal(true);
+    if (condition == null)
+      condition = new Expr.Literal(true);
 
     // * Desugaring for loops
     body = new Stmt.While(condition, body);
 
-    if(initializer != null) {
+    if (initializer != null) {
       body = new Stmt.Block(Arrays.asList(initializer, body));
     }
 
@@ -111,6 +146,7 @@ class Parser {
 
   /**
    * * Parses If Statements
+   * 
    * @return Instance of Stmt.If class
    */
   private Stmt ifStatement() {
@@ -120,7 +156,7 @@ class Parser {
 
     Stmt thenBranch = statement();
     Stmt elseBranch = null;
-    if(match(ELSE)) {
+    if (match(ELSE)) {
       elseBranch = statement();
     }
 
@@ -129,6 +165,7 @@ class Parser {
 
   /**
    * * Parses Print Statements
+   * 
    * @return Instance of Stmt.Print class
    */
   private Stmt printStatement() {
@@ -139,13 +176,14 @@ class Parser {
 
   /**
    * * Parses Var Statements
+   * 
    * @return Instance of Stmt.Var class
    */
   private Stmt varDeclaration() {
     Token name = consume(IDENTIFIER, "Expect variable name.");
 
     Expr initializer = null;
-    if(match(EQUAL)) {
+    if (match(EQUAL)) {
       initializer = expression();
     }
 
@@ -155,6 +193,7 @@ class Parser {
 
   /**
    * * Parses While Statements
+   * 
    * @return Instance of Stmt.While class
    */
   private Stmt whileStatement() {
@@ -169,6 +208,7 @@ class Parser {
 
   /**
    * * Parses Expressions Statments
+   * 
    * @return Instance of Stmt.Expression class
    */
   private Stmt expressionStatement() {
@@ -179,12 +219,13 @@ class Parser {
 
   /**
    * * Parses the block "{" declaration* "}"
+   * 
    * @return List of statements
    */
   private List<Stmt> block() {
     List<Stmt> statements = new ArrayList<>();
 
-    while(!check(RIGHT_BRACE) && !isAtEnd()) {
+    while (!check(RIGHT_BRACE) && !isAtEnd()) {
       statements.add(declaration());
     }
 
@@ -195,12 +236,12 @@ class Parser {
   private Expr assignment() {
     Expr expr = or();
 
-    if(match(EQUAL)) {
+    if (match(EQUAL)) {
       Token equals = previous();
       Expr value = assignment();
 
-      if(expr instanceof Expr.Variable) {
-        Token name = ((Expr.Variable)expr).name;
+      if (expr instanceof Expr.Variable) {
+        Token name = ((Expr.Variable) expr).name;
         return new Expr.Assign(name, value);
       }
 
@@ -212,7 +253,7 @@ class Parser {
   private Expr or() {
     Expr expr = and();
 
-    while(match(OR)) {
+    while (match(OR)) {
       Token operator = previous();
       Expr right = and();
       expr = new Expr.Logical(expr, operator, right);
@@ -224,7 +265,7 @@ class Parser {
   private Expr and() {
     Expr expr = equality();
 
-    while(match(AND)) {
+    while (match(AND)) {
       Token operator = previous();
       Expr right = equality();
       expr = new Expr.Logical(expr, operator, right);
@@ -235,8 +276,9 @@ class Parser {
 
   /**
    * * [BANG_EQUAL, EQUAL_EQUAL]
+   * 
    * @return expression
-  */
+   */
   private Expr equality() {
     Expr expr = comparision();
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
@@ -249,6 +291,7 @@ class Parser {
 
   /**
    * * [GREATER, GREATER_EQUAL, LESS, LESS_EQUAL]
+   * 
    * @return expression
    */
   private Expr comparision() {
@@ -264,6 +307,7 @@ class Parser {
 
   /**
    * * [MINUS, PLUS]
+   * 
    * @return expression
    */
   private Expr term() {
@@ -278,6 +322,7 @@ class Parser {
 
   /**
    * * [STAR, SLASH]
+   * 
    * @return expression
    */
   private Expr factor() {
@@ -292,6 +337,7 @@ class Parser {
 
   /**
    * * [BANG, MINUS]
+   * 
    * @return expression
    */
   private Expr unary() {
@@ -306,17 +352,18 @@ class Parser {
 
   /**
    * Parses single function call
+   * 
    * @return expression
    */
   private Expr finishCall(Expr callee) {
     List<Expr> arguments = new ArrayList<>();
-    if(!check(RIGHT_PAREN)) {
+    if (!check(RIGHT_PAREN)) {
       do {
-        if(arguments.size() >= 255) {
+        if (arguments.size() >= 255) {
           error(peek(), "Can't have more than 255 arguments.");
         }
         arguments.add(expression());
-      } while(match(COMMA));
+      } while (match(COMMA));
     }
     Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
     return new Expr.Call(callee, paren, arguments);
@@ -324,16 +371,16 @@ class Parser {
 
   /**
    * Parses function call
+   * 
    * @return expression
    */
   private Expr call() {
     Expr expr = primary();
 
-    while(true) {
-      if(match(LEFT_PAREN)) {
+    while (true) {
+      if (match(LEFT_PAREN)) {
         expr = finishCall(expr);
-      }
-      else {
+      } else {
         break;
       }
     }
@@ -352,7 +399,7 @@ class Parser {
       return new Expr.Literal(previous().literal);
     }
 
-    if(match(IDENTIFIER)) {
+    if (match(IDENTIFIER)) {
       return new Expr.Variable(previous());
     }
 
@@ -378,6 +425,7 @@ class Parser {
   /**
    * * Similar to match in that it checks if the next token is of the expected
    * * type.
+   * 
    * @param type
    * @param message
    * @return

@@ -55,6 +55,9 @@
 
 # Functions
 
+## Callee
+- Can be any expression that evaluates to a function
+
 ## Arity
 - Arity is fancy term for the number of arguments a function or operation expects.
    - unary operators have 1 arity
@@ -64,3 +67,9 @@
 ## Native functions
 - These are functions that the interpreter exposes to user code but that are implemented in the host language (in our case java), not the 
   language being implemented (Lox)
+
+## Lisp-1
+- Refers to languages like scheme that puts functions and variables in same namespace
+
+## Lisp-2
+- Refers to languages like Common Lisp that puts functions and variables in different namespace
