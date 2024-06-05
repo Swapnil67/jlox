@@ -47,6 +47,31 @@ class Environment {
     values.put(name, value);
   }
 
+  /*
+   * This walks a fixed number of hops up the parent chain and returns the environment there
+   */
+  Environment ancestor(int distance) {
+    Environment environment = this;
+    for (int i = 0; i < distance; i++) {
+      environment = environment.enclosing;
+    }
+    return environment;
+  }
+
+  /*
+   * It walks a fixed number of environments, and then get the value from that map.
+   */
+  Object getAt(int distance, String name) {
+    return ancestor(distance).values.get(name);
+  }
+
+  /*
+   * It walks a fixed number of environments, and then stuffs the new value in that map.
+   */
+  void assignAt(int distance, Token name, Object value) {
+    ancestor(distance).values.put(name.lexeme, value);
+  }
+
   void assign(Token name, Object value) {
     if (values.containsKey(name.lexeme)) {
       values.put(name.lexeme, value);

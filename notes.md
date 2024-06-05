@@ -40,6 +40,30 @@
 - A scope defines a region where a name maps to a certain entity.
 ### Lexical Scope / Static Scope
 - It is a specific style of scoping where the text of the program itself shows where a scope begins and ends.
+```js
+var a = "outer";
+{
+  var a = "inner";
+  print a;
+}
+```
+
+## Hoisting In JS
+- "var" are implicitly "hoisted" to the begining of the block.
+```js
+{
+  conole.log(a);
+  var a = 10;
+}
+// It behaves like
+{
+  var a; // Hoist
+  conole.log(a);
+  var a = 10;
+}
+```
+- That means that in some cases you can read a variable before its initializer has run—an annoying source of bugs. 
+  The alternate "let" syntax for declaring variables was added later to address this problem.
 
 ## Control Flow
 
@@ -73,3 +97,16 @@
 
 ## Lisp-2
 - Refers to languages like Common Lisp that puts functions and variables in different namespace
+
+## Closure
+- It "closes over" and holds on to the surrounding variables where the function is declared.
+
+## Persistent Data Structures
+- Unlike the squishy data structures you’re familiar with in imperative programming, a persistent data structure can never be directly modified.
+- Instead, any “modification” to an existing structure produces a brand new object that contains all of the original data and the new modification. The original is left unchanged.
+
+## A variable resolution pass
+- After the parser produces the syntax tree, but before the interpreter starts executing it, we’ll do a single walk over the tree to resolve all of the variables it contains. 
+- Additional passes between parsing and execution are common. If Lox had static types, we could slide a type checker in there. 
+- Optimizations are often implemented in separate passes like this too.
+- Our variable resolution pass works like a sort of "mini-interpreter". It walks the tree, visiting each node, but a static analysis is different from a dynamic execution:

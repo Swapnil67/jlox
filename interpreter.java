@@ -1,13 +1,16 @@
 package lox;
 
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   // private Environment environment = new Environment();
   final Environment globals = new Environment();
   private Environment environment = globals;
+  private final Map<Expr, Integer> locals = new HashMap<>();
 
   Interpreter() {
     globals.define("clock", new LoxCallable() {
@@ -77,7 +80,18 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Object visitVariableExpr(Expr.Variable expr) {
-    return environment.get(expr.name);
+    // return environment.get(expr.name);
+    return lookUpVariable(expr.name, expr);
+  }
+
+  private Object lookUpVariable(Token name, Expr expr) {
+    Integer distance = locals.get(expr);
+    if(distance != null) {
+      return environment.getAt(distance, name.lexeme);
+    }
+    else {
+      return globals.get(name);
+    }
   }
 
   /**
@@ -168,6 +182,13 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     stmt.accept(this);
   }
 
+  /*
+   * The resolver hands that number of environments to the interpreter by calling this:
+   */
+  void resolve(Expr expr, int depth) {
+    locals.put(expr, depth);
+  }
+
   /**
    * * We create new environment for the block scope
    * @param statements
@@ -205,7 +226,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
    */
   @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
-    LoxFunction function = new LoxFunction(stmt);
+    // * this is the env that is active when the function is declared not when
+    // * it's called. It represents the lexical scope surrounding the function declaration.
+    LoxFunction function = new LoxFunction(stmt, environment);
     environment.define(stmt.name.lexeme, function);
     return null;
   }
@@ -258,7 +281,15 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   @Override
   public Object visitAssignExpr(Expr.Assign expr) {
     Object value = evaluate(expr.value);
-    environment.assign(expr.name, value);
+
+    Integer distance = locals.get(expr);
+    if(distance != null) {
+      environment.assignAt(distance, expr.name, value);
+    }
+    else {
+      environment.assign(expr.name, value);
+    }
+
     return value;
   }
 
