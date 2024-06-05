@@ -19,8 +19,7 @@ class Parser {
 
   /**
    * * This parses the series of statements as many as it can find until it hits
-   * the end of the input.
-   * 
+   * * the end of the input.
    * @return
    */
   List<Stmt> parse() {
@@ -39,11 +38,12 @@ class Parser {
 
   /**
    * * This can be a declaration or a statement
-   * 
-   * @return
+   * @return statement
    */
   private Stmt declaration() {
     try {
+      if (match(CLASS))
+        return classDeclaration();
       if (match(FUN))
         return function("function");
       if (match(VAR))
@@ -56,12 +56,28 @@ class Parser {
   }
 
   /**
+   * * Parsing the class
+   * @return class statement
+   */
+  private Stmt classDeclaration() {
+    Token name = consume(IDENTIFIER, "Expect class name.");
+    consume(LEFT_BRACE, "Expect '{' before class body.");
+
+    List<Stmt.Function> methods = new ArrayList<>();
+    while(!check(RIGHT_BRACE) && !isAtEnd()) {
+      methods.add(function("method"));
+    }
+
+    consume(RIGHT_BRACE, "Expect '}' after class body.");
+    return new Stmt.Class(name, methods);
+  }
+
+  /**
    * * Program is a list of statements we parse one of those statements using this
-   * method
+   * * method
    * * Parse the statement
    * * [PRINT]
-   * 
-   * @return
+   * @return statement
    */
   private Stmt statement() {
     if (match(FOR))

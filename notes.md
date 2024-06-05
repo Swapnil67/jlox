@@ -77,7 +77,7 @@ var a = "outer";
 ### Desugaring
 - That funny word describes a process where the front end takes code using syntax sugar and translates it to a more primitive form that the back end already knows how to execute.
 
-# Functions
+# ---------- Functions ----------
 
 ## Callee
 - Can be any expression that evaluates to a function
@@ -110,3 +110,6 @@ var a = "outer";
 - Additional passes between parsing and execution are common. If Lox had static types, we could slide a type checker in there. 
 - Optimizations are often implemented in separate passes like this too.
 - Our variable resolution pass works like a sort of "mini-interpreter". It walks the tree, visiting each node, but a static analysis is different from a dynamic execution:
+
+# ---------- OOPs & Classes ----------
+

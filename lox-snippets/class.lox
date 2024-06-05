@@ -1,0 +1,7 @@
+class MyClass {
+  myMethod() {
+    print "Hello Lox";
+  }
+} 
+
+print MyClass;
