@@ -1,0 +1,11 @@
+class Car {
+  sound() {
+    var adjective = "awesome!!";
+    print "Sound of " + this.brand + " is " + adjective;
+  }
+}
+
+var myCar = Car();
+myCar.brand = "benz";
+
+myCar.sound();

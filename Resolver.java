@@ -14,16 +14,24 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     this.interpreter = interpreter;
   }
 
+  private enum ClassType {
+    NONE,
+    CLASS;
+  }
+
   private enum FunctionType {
     NONE,
     METHOD,
-    FUNCTION;
+    FUNCTION,
+    INITIALIZER;
   }
-  
+
+  private ClassType currentClass = ClassType.NONE;
+
   /*
-  * Begins a new scope, traverses into the statements inside the block, and then
-  * discards the scope.
-  */
+   * Begins a new scope, traverses into the statements inside the block, and then
+   * discards the scope.
+   */
   @Override
   public Void visitBlockStmt(Stmt.Block stmt) {
     beginScope();
@@ -37,13 +45,27 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
    */
   @Override
   public Void visitClassStmt(Stmt.Class stmt) {
+
+    ClassType enclosingClass = currentClass;
+    currentClass = ClassType.CLASS;
+
     declare(stmt.name);
     define(stmt.name);
 
-    for(Stmt.Function method : stmt.methods) {
+    beginScope();
+    scopes.peek().put("this", true);
+
+    for (Stmt.Function method : stmt.methods) {
       FunctionType declaration = FunctionType.METHOD;
+      if (method.name.lexeme.equals("init")) {
+        declaration = FunctionType.INITIALIZER;
+      }
       resolveFunction(method, declaration);
     }
+
+    endScope();
+
+    currentClass = enclosingClass;
 
     return null;
   }
@@ -60,7 +82,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   /**
    * * Resolving If statement
-   * * An if statement has an expression for its condition and one or two statements for the branches.
+   * * An if statement has an expression for its condition and one or two
+   * statements for the branches.
    */
   @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
@@ -79,17 +102,22 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     resolve(stmt.expression);
     return null;
   }
-  
+
   /**
    * * Resolving Return statement
    * * An return statement contains a single expression to traverse.
    */
   @Override
   public Void visitReturnStmt(Stmt.Return stmt) {
-    if(currentFunction == FunctionType.NONE) {
+    if (currentFunction == FunctionType.NONE) {
       Lox.error(stmt.keyword, "Can't return from top-level code.");
     }
-    if(stmt.value != null) {
+    if (stmt.value != null) {
+      // * Initializer functions cannot return value
+      if (currentFunction == FunctionType.INITIALIZER) {
+        Lox.error(stmt.keyword,
+            "Can't return a value from an initializer.");
+      }
       resolve(stmt.value);
     }
     return null;
@@ -97,7 +125,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   /**
    * * Resolving While statement
-   * * while statement, we resolve its condition and resolve the body exactly once.
+   * * while statement, we resolve its condition and resolve the body exactly
+   * once.
    */
   @Override
   public Void visitWhileStmt(Stmt.While stmt) {
@@ -106,23 +135,24 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     return null;
   }
 
-
   /**
    * * Resolving If statement
-   * * An if statement has an expression for its condition and one or two statements for the branches.
+   * * An if statement has an expression for its condition and one or two
+   * statements for the branches.
    */
   @Override
   public Void visitIfStmt(Stmt.If stmt) {
     resolve(stmt.condition);
     resolve(stmt.thenBranch);
-    if(stmt.elseBranch != null) resolve(stmt.elseBranch);
+    if (stmt.elseBranch != null)
+      resolve(stmt.elseBranch);
     return null;
   }
 
   @Override
   public Void visitVarStmt(Stmt.Var stmt) {
     declare(stmt.name);
-    if(stmt.initializer != null) {
+    if (stmt.initializer != null) {
       resolve(stmt.initializer);
     }
     define(stmt.name);
@@ -138,7 +168,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     resolveLocal(expr, expr.name);
     return null;
   }
-  
+
   /**
    * * Resolving Binary expression
    * * We traverse into and resolve both operands.
@@ -156,7 +186,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   @Override
   public Void visitCallExpr(Expr.Call expr) {
     resolve(expr.callee);
-    for(Expr argument : expr.arguments) {
+    for (Expr argument : expr.arguments) {
       resolve(argument);
     }
     return null;
@@ -179,13 +209,14 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   /**
    * * Resolving Literals expression
-   * * A literal expression doesn’t mention any variables and doesn’t contain any subexpressions so there is no work to do.
+   * * A literal expression doesn’t mention any variables and doesn’t contain any
+   * subexpressions so there is no work to do.
    */
   @Override
   public Void visitLiteralExpr(Expr.Literal expr) {
     return null;
   }
-  
+
   /**
    * * Resolving Logical expression
    */
@@ -205,7 +236,22 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     resolve(expr.object);
     return null;
   }
-  
+
+  /**
+   * * Resolving Set this keyword
+   */
+  @Override
+  public Void visitThisExpr(Expr.This expr) {
+    if (currentClass == ClassType.NONE) {
+      Lox.error(expr.keyword,
+          "Can't use 'this' outside of a class.");
+      return null;
+    }
+
+    resolveLocal(expr, expr.keyword);
+    return null;
+  }
+
   /**
    * * Resolving Unary expression
    */
@@ -217,7 +263,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitVariableExpr(Expr.Variable expr) {
-    if(!scopes.isEmpty() && scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
+    if (!scopes.isEmpty() && scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
       Lox.error(expr.name, "Can't read local variable in its own initializer.");
     }
     resolveLocal(expr, expr.name);
@@ -226,7 +272,9 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   /**
    * * Resolves single statement
-   * * they turn around and apply the Visitor pattern to the given syntax tree node.
+   * * they turn around and apply the Visitor pattern to the given syntax tree
+   * node.
+   * 
    * @param stmt
    */
   private void resolve(Stmt stmt) {
@@ -234,7 +282,9 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   }
 
   /**
-   * * they turn around and apply the Visitor pattern to the given syntax tree node.
+   * * they turn around and apply the Visitor pattern to the given syntax tree
+   * node.
+   * 
    * @param expr
    */
   private void resolve(Expr expr) {
@@ -243,30 +293,33 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
   /**
    * * This walks a list of statements and resolves each one. It in turn calls:
+   * 
    * @param statements
    */
   void resolve(List<Stmt> statements) {
-    for(Stmt statement: statements) {
+    for (Stmt statement : statements) {
       resolve(statement);
     }
     // for (int i = scopes.size() - 1; i >= 0; i--) {
-    //   if(scopes.get(i).containsKey(name.lexeme)) {
-    //     // * The resolver hands that number of environments to the interpreter by calling this:
-    //     interpreter.resolve(expr, scopes.size() - 1 - i);
-    //     return;
-    //   }
+    // if(scopes.get(i).containsKey(name.lexeme)) {
+    // // * The resolver hands that number of environments to the interpreter by
+    // calling this:
+    // interpreter.resolve(expr, scopes.size() - 1 - i);
+    // return;
+    // }
     // }
   }
 
   /**
    * * Resolving the function
+   * 
    * @param function
    */
   private void resolveFunction(Stmt.Function function, FunctionType type) {
     FunctionType enclosingFunction = currentFunction; // * Default NONE
     currentFunction = type;
     beginScope();
-    for(Token param: function.params) {
+    for (Token param : function.params) {
       declare(param);
       define(param);
     }
@@ -282,20 +335,23 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   private void endScope() {
     // System.out.println("------- Resolver Scopes -------");
     // for (int i = scopes.size() - 1; i >= 0; i--) {
-    //   System.out.println(scopes.get(i));
+    // System.out.println(scopes.get(i));
     // }
     // System.out.println("------- Resolver Scopes -------");
     scopes.pop();
   }
 
-  // * We mark it as “not ready yet” by binding its name to false in the scope map.
+  // * We mark it as “not ready yet” by binding its name to false in the scope
+  // map.
   private void declare(Token name) {
-    if(scopes.isEmpty()) return;
+    if (scopes.isEmpty())
+      return;
 
     Map<String, Boolean> scope = scopes.peek();
-    if(scope.containsKey(name.lexeme)) {
+    if (scope.containsKey(name.lexeme)) {
       // * When we declare a variable in a local scope, we already know the names of
-      // * every variable previously declared in that same scope. If we see a collision,
+      // * every variable previously declared in that same scope. If we see a
+      // collision,
       // * we report an error.
       Lox.error(name, "Already a variable with this name in this scope.");
     }
@@ -305,15 +361,17 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
   // * Mark the varible value in scope map to true to mark it as fully initialized
   // * and available for use.
   private void define(Token name) {
-    if(scopes.isEmpty()) return;
+    if (scopes.isEmpty())
+      return;
 
     scopes.peek().put(name.lexeme, true);
   }
 
   private void resolveLocal(Expr expr, Token name) {
     for (int i = scopes.size() - 1; i >= 0; i--) {
-      if(scopes.get(i).containsKey(name.lexeme)) {
-        // * The resolver hands that number of environments to the interpreter by calling this:
+      if (scopes.get(i).containsKey(name.lexeme)) {
+        // * The resolver hands that number of environments to the interpreter by
+        // calling this:
         interpreter.resolve(expr, scopes.size() - 1 - i);
         return;
       }
