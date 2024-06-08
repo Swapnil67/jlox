@@ -287,4 +287,11 @@ statement      → exprStmt
                | printStmt 
                | whileStmt  
                | block ;
+
+returnStmt     → "return" expression? ";" ;
+
+expression     → assignment ;
+assignment     → ( call "." )? IDENTIFIER "=" assignment
+               | logic_or ;
+
 ```

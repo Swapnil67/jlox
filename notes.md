@@ -113,3 +113,32 @@ var a = "outer";
 
 # ---------- OOPs & Classes ----------
 
+## Fields 
+- Fields are named bits of state stored directly in an instance. 
+
+## Properties 
+- Properties are the named, uh, things, that a get expression may return. 
+- Every field is a property, but not every property is a field.
+
+## Methods in javascript
+```js
+class Person {
+  sayName() {
+    print this.name;
+  }
+}
+
+var jane = Person();
+jane.name = "Jane";
+
+var bill = Person();
+bill.name = "Bill";
+
+bill.sayName = jane.sayName;
+bill.sayName(); // ?
+```
+- For JS Everything is sort of functions-in-fields so it’s not clear that jane “owns” sayName any more than bill does.
+
+## bound methods.
+- Thus, like Python, C#, and others, we will have methods “bind” this to the original instance when the method is first grabbed.
+- In practice, that’s usually what you want. If you take a reference to a method on some object so you can use it as a callback later, you want to remember the instance it belonged to, even if that callback happens to be stored in a field on some other object.
